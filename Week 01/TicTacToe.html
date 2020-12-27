@@ -1,0 +1,165 @@
+
+
+<!DOCTYPE html>
+<html>
+  <style>
+    .cell{
+      width: 100px;
+      height: 100px;
+      background-color: burlywood;
+      display: inline-block;
+      border: 1px solid white;
+      vertical-align: middle;
+
+      line-height: 100px;
+      font-size: 50px;
+      text-align: center;
+    }
+
+  </style>
+  <div id='board'></div>
+  <script>
+    let pattern = [
+      0,0,0,
+      0,0,0, 
+      0,0,0
+    ]
+    let color = 1
+    function show(){
+      const board =document.getElementById('board');
+      board.innerHTML = ''
+      for(let y=0;y<3;y++){
+        for(let x=0;x<3;x++){
+          let cell =document.createElement('div')
+          cell.classList.add('cell')
+          cell.innerText=pattern[y*3+x]==2? "❌":
+              pattern[y*3+x]=== 1 ?"⭕️":""
+          cell.addEventListener("click",()=>userMove(x,y))
+          board.appendChild(cell)
+        } 
+        board.appendChild(document.createElement('br'))
+      }
+    }
+    function userMove(x,y){
+      pattern[y*3+x]=color;
+      if(check(pattern,color)){ 
+        alert(color===1? "⭕️ is winner":"❌ is winner")
+      }
+      color = 3-color
+      show()
+      console.log(besetChoice(pattern,color))
+      computerMove()
+    } 
+    function computerMove(){
+      const choice =besetChoice(pattern,color)
+      if(choice.point){
+        const [x,y] =choice.point
+        pattern[y*3+x]=color;
+      }
+      if(check(pattern,color)){ 
+        alert(color===1? "⭕️ is winner":"❌ is winner")
+      }
+      color = 3-color
+      show()
+      console.log(besetChoice(pattern,color))
+    } 
+    function clone(obj){
+      return Object.create(obj)
+    }
+    function willWin(pattern,color){
+      for(let y=0;y<3;y++){
+        for(let x=0;x<3;x++){
+          if(pattern[y*3+x]!==0){
+            continue
+          }
+          let temp = clone(pattern)
+          temp[y*3+x] = color
+          if(check(temp,color)){
+            return [x,y]
+          }
+        }
+      }
+      return null
+    }
+    function check(pattern,color){
+      for(let y =0;y<3;y++){
+        let win = true;
+        for(let x=0;x<3;x++){
+          if(pattern[y*3+x]!==color){
+            win = false
+          }
+        }
+        if(win){
+          return true
+        }
+      }
+      for(let y =0;y<3;y++){
+        let win = true;
+        for(let x=0;x<3;x++){
+          if(pattern[x*3+y]!==color){
+            win = false
+          }
+        }
+        if(win){
+          return true
+        }
+      }
+      {
+        let win = true;
+        for(let y=0;y<3;y++){
+          if(pattern[y*3+y]!==color){
+            win = false
+          }
+        }
+        if(win){
+          return true
+        }
+      }
+      {
+        let win = true;
+        for(let y=0;y<3;y++){
+          if(pattern[y*3+2-y]!==color){
+            win = false
+          }
+        }
+        if(win){
+          return true
+        }
+      }
+    }
+    function besetChoice(pattern,color){
+      let p =willWin(pattern,color);
+      if(p){
+        return {
+          point:p,
+          result:1
+        }
+      }
+      let result = -2;
+      let point = null;
+      outer:for(let y=0;y<3;y++){
+        for(let x=0;x<3;x++){
+          if(pattern[y*3+x]){
+            continue
+          }
+          let tmp = clone(pattern)
+          tmp[y*3+x] = color
+          let r = besetChoice(tmp,3-color).result
+          if(-r>result){
+            result = -r
+            point=[x,y]
+          }
+          if(result===1){
+            break outer;
+          }
+
+        }
+      }
+      return {
+        point,
+        result:point?result:0
+      }
+    }
+    show()
+  </script>
+</html>
