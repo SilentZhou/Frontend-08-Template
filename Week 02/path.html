@@ -22,6 +22,36 @@
   <button id="reset">reset</button>
 
   <script>
+    class Sorted{
+      constructor(data,compare){
+        this.data = data.slice();
+        this.compare=compare||((a,b)=>a-b);
+        this.length = this.data.length
+      }
+      take(){
+        let min = this.data[0];
+        let minIndex = 0;
+        let len = this.data.length
+        if(!len){
+          return
+        }
+        for(let i = 1;i<len;i++){
+          if(this.compare(min,this.data[i])>0){
+            min = this.data[i];
+            minIndex = i
+          }
+        }
+        this.data[minIndex]=this.data[len-1]
+        this.data.pop()
+        return min
+      }
+      give(data){
+        this.data.push(data)
+      }
+      length(){
+        return  this.data.length
+      }
+    }
     let map = localStorage["map"]?JSON.parse(localStorage["map"]):Array(10000).fill(0);
 
     let container = document.getElementById("container");
@@ -81,8 +111,11 @@
 
     async function findPath(map,start,end){
       let table = Object.create(map)
-      let queue = [start]
-
+      let queue = new Sorted([start],(a,b)=>distance(a)-distance(b))
+      // let queue = [start]
+      function distance(point){
+        return (point[0]-end[0])**2+(point[1]-end[1])**2
+      }
       async function insert(x,y,pre){
         if(x<0||x>=100||y<0||y>=100){
           return
@@ -90,13 +123,15 @@
         if(table[y*100+x]) {
           return
         }
+        await sleep(1);
+
         container.children[y*100+x].style.backgroundColor = 'green'
         table[y*100+x] = pre
-        queue.push([x,y])
+        queue.give([x,y])
       }
 
       while(queue.length){
-        let [x,y] = queue.shift() 
+        let [x,y] = queue.take() 
         if(x===end[0]&&y===end[1]){
           let path=[end]
           while(x!==start[0]||y!==start[1]){
