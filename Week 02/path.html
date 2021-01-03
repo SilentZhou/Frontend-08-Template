@@ -1,0 +1,130 @@
+
+<html>
+  <style>
+    .cell{
+      display: inline-block;
+      line-height: 7px;
+      width: 6px;
+      height: 6px;
+      background-color: gray;
+      border-bottom:solid 1px  white;
+      border-right:solid 1px  white;
+
+      vertical-align: middle;
+    }
+    #container{
+      width: 701px;
+    }
+
+  </style>
+  <div id="container"></div>
+  <button onclick="localStorage['map']=JSON.stringify(map)">save</button>
+  <button id="reset">reset</button>
+
+  <script>
+    let map = localStorage["map"]?JSON.parse(localStorage["map"]):Array(10000).fill(0);
+
+    let container = document.getElementById("container");
+
+
+    function show(){
+      for(let y=0;y<100;y++){
+      for(let x=0;x<100;x++ ){
+        let cell  = document.createElement('div')
+        cell.classList.add('cell')
+        if(map[100*y+x]===1){
+          cell.style.backgroundColor="black";
+        }
+        cell.addEventListener("mousemove",()=>{
+          if(mouseDown){
+            if(clear){
+              cell.style.backgroundColor="";
+              map[100*y+x] = 0;
+            }else{
+              cell.style. backgroundColor="black";
+              map[100*y+x] = 1;
+            }
+          }
+
+        })
+        container.appendChild(cell);
+      }
+    }
+
+    }
+    
+    show()
+    let resetBtn = document.getElementById("reset");
+    resetBtn.addEventListener('click',()=>{
+
+      container.innerHTML=''
+      map = Array(10000).fill(0)
+      localStorage['map']=JSON.stringify(map)
+
+      show()
+    })
+    let mouseDown = false;
+    let clear = false;
+    container.addEventListener("mousedown",e=>{
+      mouseDown=true;
+      clear = (e.which===3)
+    })
+    container.addEventListener("mouseup",()=>mouseDown=false)
+
+    container.addEventListener('contextmenu',e=>e.preventDefault())
+    function sleep(time){
+      return new Promise((resolve,reject)=>{
+        setTimeout(resolve,time)
+        })
+    }
+
+
+    async function findPath(map,start,end){
+      let table = Object.create(map)
+      let queue = [start]
+
+      async function insert(x,y,pre){
+        if(x<0||x>=100||y<0||y>=100){
+          return
+        }
+        if(table[y*100+x]) {
+          return
+        }
+        container.children[y*100+x].style.backgroundColor = 'green'
+        table[y*100+x] = pre
+        queue.push([x,y])
+      }
+
+      while(queue.length){
+        let [x,y] = queue.shift() 
+        if(x===end[0]&&y===end[1]){
+          let path=[end]
+          while(x!==start[0]||y!==start[1]){
+
+               [x,y]  = table[y*100+x]
+                await sleep(1);
+                path.push(table[y*100+x])
+               
+               container.children[y*100+x].style.backgroundColor = 'purple'
+
+           }
+          return path
+        }
+        await insert(x,y+1,[x,y]);
+        await insert(x+1,y,[x,y]);
+        await insert(x-1,y,[x,y]);
+        await insert(x,y-1,[x,y]);
+
+        await insert(x+1,y+1,[x,y]);
+        await insert(x-1,y+1,[x,y]);
+        await insert(x-1,y-1,[x,y]);
+        await insert(x+1,y-1,[x,y]);
+
+      }
+      return null
+    }
+
+
+
+  </script>
+</html>
