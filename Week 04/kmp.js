@@ -51,6 +51,3 @@ console.log('res1',res1)
 console.log('res2',res2)
 console.log('res3',res3)
 
-
-
-// 
