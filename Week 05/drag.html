@@ -1,4 +1,77 @@
-<div></div>
+<div id="container">
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字
+ </div>
+<div id="draggable" style="display:inline-block;width:50px;height: 50px;background-color: aquamarine;" ></div>
 <script>
-  
+  let draggable = document.getElementById("draggable");
+
+  let baseX = 0;
+  let baseY = 0;
+
+  draggable.addEventListener("mousedown",function(event){
+    let startX = event.clientX;
+    let startY = event.clientY;
+
+    function onMousemove(event){
+      // console.log('onMousemove',event)
+      // draggable.style.transform = `translate(${baseX+event.clientX-startX}px,${baseY+event.clientY-startY}px)`
+      let range = getNearest(event.clientX,event.clientY)
+
+      range.insertNode(draggable)
+    }
+    function onMouseup(event){
+      // console.log('onMouseup',event)
+      baseX = baseX +event.clientX-startX;
+      baseY = baseY +event.clientY-startY;
+
+      document.removeEventListener("mousemove",onMousemove);
+      document.removeEventListener("mouseup",onMouseup);
+
+    }
+    document.addEventListener("mousemove",onMousemove);
+    document.addEventListener("mouseup",onMouseup);
+
+  })
+  let ranges = []
+  let container = document.getElementById("container")
+  console.log("container container.childNodes[0]",container,container.childNodes[0])
+  for(let i=0;i<container.childNodes[0].textContent.length;i++){
+    // https://developer.mozilla.org/en-US/docs/Web/API/Range
+    let range = document.createRange()
+    range.setStart(container.childNodes[0],i);
+    range.setEnd(container.childNodes[0],i)
+    console.log("range",range.getBoundingClientRect())
+    ranges.push(range)
+  }
+  function getNearest(x,y){
+    let min = Infinity;
+    let nearest = null;
+    for(let range of ranges){
+      let rect  = range.getBoundingClientRect()
+      let distance  = (rect.x - x )**2 +(rect.y - y )**2
+      if(distance<min){
+        min = distance
+        nearest = range
+      }
+
+    }
+
+    return nearest;
+  }
+document.addEventListener("selectstart",event=>event.preventDefault())
+
 </script>
