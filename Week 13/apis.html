@@ -1,6 +1,9 @@
 <script>
   let names = Object.getOwnPropertyNames(window);
 
+  console.log("names all", names)
+
+
   function filterOut(names, props) {
     let set = new Set();
     props.forEach(o => set.add(o));
