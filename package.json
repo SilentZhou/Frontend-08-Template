@@ -19,5 +19,9 @@
   "homepage": "https://github.com/SilentZhou/Frontend-08-Template#readme",
   "dependencies": {
     "css": "^3.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.27.0",
+    "eslint-plugin-react": "^7.23.2"
   }
 }
